@@ -1,0 +1,61 @@
+// idl/task/task.proto
+syntax = "proto3";
+package task;
+option go_package = "task";
+
+import "api.proto";
+
+message TaskModel {
+  int64 ID = 1; // id
+  int64 UID = 2; // 用户id
+  string Title = 3; // 标题
+  string Content = 4; // 内容
+  int64 CreatedAt = 7; // gorm.Model 创建时间
+  int64 UpdatedAt = 8; // gorm.Model 更新时间
+  int64 IsDeleted = 9; // 删除标识
+}
+
+// 封装task服务请求参数
+message TaskRequest {
+  uint64 Id = 1[(api.body)="id",(api.path)="id"];
+  uint64 Uid = 2[(api.body)="uid"];
+  string Title = 3[(api.body)="title"];
+  string Content = 4[(api.body)="content"];
+  uint32 PageNum = 8[(api.path)="pageNum"];
+  uint32 PageSize = 9[(api.path)="pageSize"];
+}
+
+// 获取全部备忘录的响应结构体
+message TaskListResponse {
+  repeated TaskModel taskModel = 1;
+  int64 Count = 2;
+}
+
+// 获取备忘录详情的响应结构体
+message TaskResponse {
+  uint32 Code = 1;
+  TaskModel TaskDetail = 2;
+}
+
+service TaskService {
+  // 创建
+  rpc CreateTask(TaskRequest) returns (TaskResponse) {
+    option (api.post) = "/task/create";
+  }
+  // 更新
+  rpc UpdateTask(TaskRequest) returns (TaskResponse) {
+    option (api.put) = "/task/update/:id";
+  }
+  // 删除
+  rpc DeleteTask(TaskRequest) returns (TaskResponse) {
+    option (api.delete) = "/task/delete/:id";
+  }
+  // 获取详情
+  rpc GetTaskDetail(TaskRequest) returns (TaskResponse) {
+    option (api.get) = "/task/getDetail/:id";
+  }
+  // 获取全部
+  rpc GetTaskList(TaskRequest) returns (TaskListResponse) {
+    option (api.get) = "/task/getList/:pageSize/:pageNum";
+  }
+}

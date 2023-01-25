@@ -1,0 +1,35 @@
+// idl/user/user.proto
+syntax = "proto3";
+package user; // 指定message(model)的包名
+option go_package = "user"; // 指定service(router)的包名
+
+import "api.proto";
+
+// 定义模型
+message UserModel {
+  int64 ID = 1; // 用户id
+  string Username = 2; // 用户名
+  string Password = 3; // 密码
+  int64 CreatedAt = 4; // gorm.Model 创建时间
+  int64 UpdatedAt = 5; // gorm.Model 更新时间
+  int64 IsDeleted = 6; // 删除标识
+}
+
+// 封装用户请求
+message UserRequest {
+  string Username = 1[(api.body)="username"];
+  string Password = 2[(api.body)="password"];
+}
+
+// 封装用户响应
+message UserDetailResponse {
+  uint32 Code = 1;
+  UserModel UserDetail = 2;
+}
+
+service UserService {
+  // 注册
+  rpc UserRegister(UserRequest) returns(UserDetailResponse){
+    option (api.post) = "/user/register";
+  }
+}
